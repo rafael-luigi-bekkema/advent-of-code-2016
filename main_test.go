@@ -21,7 +21,7 @@ func TestDay8(t *testing.T) {
 		"#  # #    #    #    #    #  #   #  #    #  #    # \n" +
 		" ##  #    #### #### ####  ##    #  #     ##  ###  \n"
 	TestEqual(t, len(expectDisp), len(out))
-	TestEqual(t, expectDisp, out)
+	TestEqual(t, expectDisp, out, "CFLELOYFCS")
 }
 
 func TestDay7(t *testing.T) {
