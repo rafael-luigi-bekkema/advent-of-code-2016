@@ -4,7 +4,18 @@ import (
 	"testing"
 )
 
-func TestDay5a(t *testing.T) {
+func TestDay6(t *testing.T) {
+	input := []string{"eedadn", "drvtee", "eandsr", "raavrd", "atevrs", "tsrnev", "sdttsa", "rasrtv",
+		"nssdts", "ntnada", "svetve", "tesnvt", "vntsnd", "vrdear", "dvrsen", "enarar"}
+	file := Lines(6)
+	TestEqual(t, "easter", day6a(input))
+	TestEqual(t, "tsreykjj", day6a(file))
+
+	TestEqual(t, "advent", day6b(input))
+	TestEqual(t, "hnfbujie", day6b(file))
+}
+
+func TestDay5(t *testing.T) {
 	TestEqual(t, "18f47a30", day5a("abc"))
 	TestEqual(t, "2414bc77", day5a("wtnhxymk"))
 
