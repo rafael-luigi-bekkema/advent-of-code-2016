@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 	"log"
 	"sort"
@@ -9,6 +10,49 @@ import (
 
 	"github.com/rafael-luigi-bekkema/advent-of-code-2016/set"
 )
+
+func day5b(doorID string) string {
+	i := -1
+	var found int
+	pass := [8]byte{'_', '_', '_', '_', '_', '_', '_', '_'}
+	for {
+		i++
+		hash := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprint(doorID, i))))
+		if hash[:5] == "00000" {
+			pos := int(hash[5] - '0')
+			if !(0 <= pos && pos <= 7) || pass[pos] != '_' {
+				continue
+			}
+
+			pass[pos] = hash[6]
+			found++
+
+			fmt.Printf("\rfound %s %8d %s", string(pass[:]), i, hash)
+			if found == 8 {
+				fmt.Print("\n\n")
+				break
+			}
+		}
+	}
+	return string(pass[:])
+}
+
+func day5a(doorID string) string {
+	var i int
+	pass := make([]byte, 0, 8)
+	for {
+		hash := fmt.Sprintf("%x", md5.Sum([]byte(fmt.Sprint(doorID, i))))
+		if hash[:5] == "00000" {
+			pass = append(pass, hash[5])
+			fmt.Println("found", len(pass), i, hash)
+			if len(pass) == 8 {
+				break
+			}
+		}
+		i++
+	}
+	return string(pass)
+}
 
 func day4b(input string, sid int) string {
 	chars := []byte(strings.ReplaceAll(input, "-", " "))

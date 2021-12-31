@@ -4,6 +4,14 @@ import (
 	"testing"
 )
 
+func TestDay5a(t *testing.T) {
+	TestEqual(t, "18f47a30", day5a("abc"))
+	// TestEqual(t, "2414bc77", day5a("wtnhxymk"))
+
+	// TestEqual(t, "05ace8e3", day5b("abc"))
+	// TestEqual(t, "2414bc77", day5b("wtnhxymk"))
+}
+
 func TestDay4a(t *testing.T) {
 	result, _ := day4a([]string{
 		"aaaaa-bbb-z-y-x-123[abxyz]",
