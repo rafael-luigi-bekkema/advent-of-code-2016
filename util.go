@@ -88,3 +88,15 @@ func TestEqual[T comparable](t *testing.T, expect, result T, message ...string) 
 		}
 	})
 }
+
+func MinMax[T constraints.Integer | constraints.Float](values []T) (min T, max T) {
+	for i, v := range values {
+		if i == 0 || v < min {
+			min = v
+		}
+		if i == 0 || v > max {
+			max = v
+		}
+	}
+	return min, max
+}
