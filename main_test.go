@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func TestDay15(t *testing.T) {
+	TestEqual(t, 5, day15a([]string{
+		"Disc #1 has 5 positions; at time=0, it is at position 4.",
+		"Disc #2 has 2 positions; at time=0, it is at position 1.",
+	}))
+	TestEqual(t, 122318, day15a(Lines(15)))
+	TestEqual(t, 3208583, day15b(Lines(15)))
+}
+
 func TestDay14(t *testing.T) {
 	TestEqual(t, 22728, day14a("abc", 64))
 	TestEqual(t, 15168, day14a("qzyelonm", 64))
