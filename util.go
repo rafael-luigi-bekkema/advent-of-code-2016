@@ -100,3 +100,17 @@ func MinMax[T constraints.Integer | constraints.Float](values []T) (min T, max T
 	}
 	return min, max
 }
+
+func Remove[T comparable](list []T, remove ...T) []T {
+	var newlist []T
+outer:
+	for i := range list {
+		for j := range remove {
+			if list[i] == remove[j] {
+				continue outer
+			}
+		}
+		newlist = append(newlist, list[i])
+	}
+	return newlist
+}

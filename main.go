@@ -11,6 +11,177 @@ import (
 	"github.com/rafael-luigi-bekkema/advent-of-code-2016/set"
 )
 
+func day12b(input []string) int {
+	return day12(input, true)
+}
+
+func day12a(input []string) int {
+	return day12(input, false)
+}
+
+func day12(input []string, b bool) int {
+	type CPU struct {
+		regs    [4]int
+		counter int
+	}
+
+	var cpu CPU
+	if b {
+		cpu.regs[2] = 1
+	}
+
+	set := func(s string, v int) {
+		cpu.regs[s[0]-'a'] = v
+	}
+
+	get := func(s string) int {
+		if '0' <= s[0] && s[0] <= '9' || s[0] == '-' {
+			return Atoi(s)
+		}
+		return cpu.regs[s[0]-'a']
+	}
+
+	run := func(ins string) {
+		cmd, rest, _ := strings.Cut(ins, " ")
+		switch cmd {
+		case "cpy":
+			from, to, _ := strings.Cut(rest, " ")
+			set(to, get(from))
+		case "inc":
+			set(rest, get(rest)+1)
+		case "dec":
+			set(rest, get(rest)-1)
+		case "jnz":
+			x, jmp, _ := strings.Cut(rest, " ")
+			if get(x) != 0 {
+				cpu.counter += get(jmp) - 1
+			}
+		default:
+			panic("unknown cmd")
+		}
+	}
+
+	for cpu.counter = 0; cpu.counter < len(input); cpu.counter++ {
+		run(input[cpu.counter])
+	}
+
+	return cpu.regs[0] // register 'a'
+}
+
+/*
+F4 .  .  .  .  .
+F3 .  .  .  LG .
+F2 .  HG .  .  .
+F1 E  .  HM .  LM
+*/
+
+func day11a(floors [4][]string) int {
+	safe := func(items []string) bool {
+		hasgen := false
+		mols := map[string]int{}
+		for _, item := range items {
+			if item[1] == 'M' {
+				mols[item]++
+			} else {
+				mols[string([]byte{item[0], 'M'})]--
+				hasgen = true
+			}
+		}
+		if !hasgen {
+			return true
+		}
+		for _, c := range mols {
+			if c > 0 {
+				return false
+			}
+		}
+		return true
+	}
+
+	/*
+		F4 .  .  .  .  .  .  .  .  .  .  .  .
+		F3 .  .  .  .  .  .  .  TM .  .  .  .
+		F2 .  .  .  .  .  .  TG . RG RM CG CM
+		F1 E  SG  SM PG  PM  .  .  .  .  .  .
+	*/
+	// All Ms op top floor: cannot bring generators into top floor without destroying Ms
+
+	copyFloors := func(floors [4][]string) [4][]string {
+		var f [4][]string
+		for i, floor := range floors {
+			f[i] = make([]string, len(floor))
+			copy(f[i], floor)
+		}
+		return f
+	}
+
+	var minMoves int
+	var step func(lift int, floors [4][]string, moves int)
+	step = func(lift int, floors [4][]string, moves int) {
+		if minMoves != 0 && moves >= minMoves {
+			return
+		}
+		for _, up := range []int{1, -1} {
+			if up == -1 && lift == 0 || up == 1 && lift == 3 {
+				continue
+			}
+			for i, item := range floors[lift] {
+				for _, item2 := range append(floors[lift][i+1:], "") {
+					items := []string{item}
+					if item2 != "" { // use this to try single item in lift
+						items = append(items, item2)
+					}
+					if lift == 3 && item2 != "" {
+						continue
+					}
+					if up < 0 && item2 != "" {
+						continue
+					}
+					for len(floors[lift+up]) == 0 {
+						if up > 0 && lift+up < 3 {
+							up++
+							continue
+						}
+						if up < 0 && lift+up > 0 {
+							up--
+							continue
+						}
+						break
+					}
+					if lift+up == 0 && len(floors[0]) == 0 {
+						continue
+					}
+					if lift+up == 3 && len(items) == 1 {
+						continue
+					}
+					if !safe(append(items, floors[lift+up]...)) || !safe(Remove(floors[lift], items...)) {
+						continue
+					}
+
+					newFloors := copyFloors(floors)
+					newFloors[lift] = Remove(newFloors[lift], items...)
+					newFloors[lift+up] = append(newFloors[lift+up], items...)
+					fmt.Println("try", items, "to", lift+up)
+					fmt.Println(newFloors)
+
+					if len(newFloors[0])+len(newFloors[1])+len(newFloors[2]) == 0 {
+						nmoves := moves + Abs(up)
+						if minMoves == 0 || nmoves < minMoves {
+							minMoves = nmoves
+							fmt.Println("have minmoves", minMoves)
+						}
+					} else {
+						step(lift+up, newFloors, moves+Abs(up))
+					}
+				}
+			}
+		}
+	}
+	step(0, floors, 0)
+
+	return minMoves
+}
+
 func day10(input []string, checklow, checkhigh int, b bool) int {
 	type Ins struct {
 		frombot, tolow, tohigh int

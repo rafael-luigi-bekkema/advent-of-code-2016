@@ -6,6 +6,49 @@ import (
 	"testing"
 )
 
+func TestDay12(t *testing.T) {
+	TestEqual(t, 42, day12a([]string{"cpy 41 a",
+		"inc a",
+		"inc a",
+		"dec a",
+		"jnz a 2",
+		"dec a",
+	}))
+	TestEqual(t, 6, day12a([]string{"cpy 5 a",
+		"jnz a 2",
+		"inc a",
+		"inc a",
+	}))
+	TestEqual(t, 317993, day12a(Lines(12)))
+	TestEqual(t, 9227647, day12b(Lines(12)))
+}
+
+func TestDay11(t *testing.T) {
+	// TestEqual(t, 11, day11a(
+	// 	[4][]string{
+	// 		{"HM", "LM"},
+	// 		{"HG"},
+	// 		{"LG"},
+	// 		nil,
+	// 	},
+	// ))
+
+	/*
+		F4 .  .  .  .  .  .  .  .  .  .  .  .
+		F3 .  .  .  .  .  .  .  TM .  .  .  .
+		F2 .  .  .  .  .  .  TG . RG RM CG CM
+		F1 E  SG  SM PG  PM  .  .  .  .  .  .
+	*/
+	TestEqual(t, -1, day11a(
+		[4][]string{
+			{"SM", "PM", "SG", "PG"},
+			{"RM", "CM", "TG", "RG", "CG"},
+			{"TM"},
+			nil,
+		},
+	))
+}
+
 func TestDay10(t *testing.T) {
 	TestEqual(t, 2, day10([]string{
 		"value 5 goes to bot 2",
