@@ -3,6 +3,7 @@ package util
 import (
 	"bufio"
 	"constraints"
+	"crypto/md5"
 	"fmt"
 	"io"
 	"os"
@@ -113,4 +114,8 @@ outer:
 		newlist = append(newlist, list[i])
 	}
 	return newlist
+}
+
+func MD5(input string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(input)))
 }
