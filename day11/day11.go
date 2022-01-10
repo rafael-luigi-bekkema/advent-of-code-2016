@@ -8,146 +8,7 @@ import (
 	"github.com/rafael-luigi-bekkema/advent-of-code-2016/util"
 )
 
-func day11a() int {
-	lift := 0
-	levels := [4][]string{
-		{"SG", "SM", "PG", "PM"},
-		{"TG", "RG", "RM", "CG", "CM"},
-		{"TM"},
-		{},
-	}
-
-	validate := func() {
-		for _, level := range levels {
-			var hasGen bool
-			match := map[byte]int{}
-			for _, item := range level {
-				if item[1] == 'G' {
-					hasGen = true
-					match[item[0]]--
-					continue
-				}
-				match[item[0]]++
-			}
-			if hasGen {
-				for c, m := range match {
-					if m > 0 {
-						panic(fmt.Sprintf("unprotected M: %cM", c))
-					}
-				}
-			}
-		}
-	}
-
-	move := func(from, to int, items ...string) {
-		if len(items) == 0 || len(items) > 2 {
-			panic("not enough items")
-		}
-		if from != lift {
-			panic("wrong level")
-		}
-		for _, item := range items {
-			var found bool
-			for i := len(levels[from]) - 1; i >= 0; i-- {
-				if levels[from][i] == item {
-					levels[from][i], levels[from][len(levels[from])-1] = levels[from][len(levels[from])-1], levels[from][i]
-					levels[from] = levels[from][:len(levels[from])-1]
-					found = true
-					break
-				}
-			}
-			if !found {
-				panic("moved item from wrong level")
-			}
-			levels[to] = append(levels[to], item)
-		}
-		lift = to
-	}
-
-	render := func() {
-		var all []string
-		for _, l := range levels {
-			all = append(all, l...)
-		}
-		sort.Strings(all)
-
-		fmt.Println()
-		for i := 3; i >= 0; i-- {
-			fmt.Printf("  %d |", i+1)
-			if i == lift {
-				fmt.Printf(" E |")
-			} else {
-				fmt.Printf("   |")
-			}
-		all:
-			for _, a := range all {
-				for _, sa := range levels[i] {
-					if a == sa {
-						fmt.Printf(" %s |", a)
-						continue all
-					}
-				}
-				fmt.Printf("    |")
-			}
-			fmt.Println()
-		}
-	}
-
-	type Move struct {
-		from, to int
-		items    []string
-	}
-	moves := []Move{
-		{0, 1, []string{"SG", "PG"}},
-		{1, 2, []string{"SG", "TG"}},
-		{2, 1, []string{"SG"}},
-		{1, 2, []string{"SG", "PG"}},
-		{2, 1, []string{"SG"}},
-		{1, 2, []string{"RG", "RM"}},
-		{2, 1, []string{"PG"}},
-		{1, 2, []string{"PG", "SG"}},
-		{2, 1, []string{"PG"}},
-		{1, 2, []string{"CG", "CM"}},
-		{2, 1, []string{"SG"}},
-		{1, 2, []string{"SG", "PG"}},
-		{2, 3, []string{"CG", "CM"}},
-		{3, 2, []string{"CG"}},
-		{2, 3, []string{"CG", "PG"}},
-		{3, 2, []string{"PG"}},
-		{2, 3, []string{"PG", "SG"}},
-		{3, 2, []string{"SG"}},
-		{2, 3, []string{"TG", "TM"}},
-		{3, 2, []string{"PG"}},
-		{2, 3, []string{"PG", "SG"}},
-		{3, 2, []string{"SG"}},
-		{2, 3, []string{"RG", "RM"}},
-		{3, 2, []string{"PG"}},
-		{2, 3, []string{"PG", "SG"}},
-		{3, 2, []string{"RM"}},
-		{2, 1, []string{"RM"}},
-		{1, 0, []string{"RM"}},
-		{0, 1, []string{"RM", "PM"}},
-		{1, 2, []string{"RM", "PM"}},
-		{2, 3, []string{"RM", "PM"}},
-		{3, 2, []string{"RM"}},
-		{2, 1, []string{"RM"}},
-		{1, 0, []string{"RM"}},
-		{0, 1, []string{"RM", "SM"}},
-		{1, 2, []string{"RM", "SM"}},
-		{2, 3, []string{"RM", "SM"}},
-	}
-
-	render()
-	for i, m := range moves {
-		fmt.Printf("\nmove %d: %v to %d\n", i+1, m.items, m.to)
-		move(m.from, m.to, m.items...)
-		render()
-		validate()
-	}
-	return len(moves)
-}
-
-func day11b(b bool) int {
+func day11(b bool) int {
 	var levels [4][]string
 	if !b {
 		levels = [4][]string{
@@ -250,14 +111,11 @@ func day11b(b bool) int {
 	}
 
 	move := func(levels [4][]string, move Move) [4][]string {
-		if move.item1 == "" {
-			panic("not enough items")
-		}
+		from, to := move.from, move.to
 		for _, item := range []string{move.item1, move.item2} {
 			if item == "" {
 				continue
 			}
-			from, to := move.from, move.to
 			var found bool
 			for i := len(levels[move.from]) - 1; i >= 0; i-- {
 				if levels[from][i] == item {
@@ -297,8 +155,6 @@ func day11b(b bool) int {
 			if lift == 2 && len(levels[0]) == 0 && len(levels[1]) == 0 {
 				return
 			}
-		}
-		if up < 0 {
 			for _, s := range levels[lift] {
 				mv := Move{lift, lift + up, s, ""}
 				levels := move(copyLevels(levels), mv)
@@ -309,60 +165,6 @@ func day11b(b bool) int {
 		}
 		return
 	}
-
-	// var minfound int
-	// moves := []Move{
-	// 	{0, 1, "SG", "PG"},
-	// 	{1, 2, "SG", "TG"},
-	// 	{2, 1, "SG", ""},
-	// 	{1, 2, "SG", "PG"},
-	// 	{2, 1, "SG", ""},
-	// 	{1, 2, "RG", "RM"},
-	// 	{2, 1, "PG", ""},
-	// 	{1, 2, "PG", "SG"},
-	// 	{2, 1, "PG", ""},
-	// 	{1, 2, "CG", "CM"},
-	// 	{2, 1, "SG", ""},
-	// 	{1, 2, "SG", "PG"},
-	// 	{2, 3, "CG", "CM"},
-	// 	{3, 2, "CG", ""},
-	// 	{2, 3, "CG", "PG"},
-	// 	{3, 2, "PG", ""},
-	// 	{2, 3, "PG", "SG"},
-	// 	{3, 2, "SG", ""},
-	// 	{2, 3, "TG", "TM"},
-	// 	{3, 2, "PG", ""},
-	// 	{2, 3, "PG", "SG"},
-	// 	{3, 2, "SG", ""},
-	// 	{2, 3, "RG", "RM"},
-	// 	{3, 2, "PG", ""},
-	// 	{2, 3, "PG", "SG"},
-	// 	{3, 2, "RM", ""},
-	// 	{2, 1, "RM", ""},
-	// 	{1, 0, "RM", ""},
-	// 	{0, 1, "RM", "PM"},
-	// 	{1, 2, "RM", "PM"},
-	// 	{2, 3, "RM", "PM"},
-	// 	{3, 2, "RM", ""},
-	// 	{2, 1, "RM", ""},
-	// 	{1, 0, "RM", ""},
-	// 	{0, 1, "RM", "SM"},
-	// 	{1, 2, "RM", "SM"},
-	// 	{2, 3, "RM", "SM"},
-	// }
-	// var count int
-	// for _, mv := range moves {
-	// 	items := []string{mv.item1}
-	// 	if mv.item2 != "" {
-	// 		items = append(items, mv.item2)
-	// 	}
-	// 	levels = move(levels, mv.from, mv.to, items...)
-	// 	if !validate(levels) {
-	// 		panic("invalid")
-	// 	}
-	// 	count++
-	// }
-	// return count
 
 	fmt.Println(render(levels, 0, 0))
 	var minfound int
@@ -407,6 +209,6 @@ func day11b(b bool) int {
 }
 
 func Day11b() {
-	res := day11b(true)
+	res := day11(true)
 	fmt.Println("day 11a:", res)
 }

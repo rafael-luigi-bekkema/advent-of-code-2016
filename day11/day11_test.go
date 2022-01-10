@@ -7,6 +7,6 @@ import (
 )
 
 func TestDay11(t *testing.T) {
-	TestEqual(t, 37, day11b(false))
-	TestEqual(t, 61, day11b(true))
+	TestEqual(t, 37, day11(false))
+	TestEqual(t, 61, day11(true))
 }
