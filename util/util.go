@@ -13,9 +13,21 @@ import (
 	"testing"
 )
 
-const inputDir = "."
+var inputDir = "."
+
+func init() {
+	if idir, err := filepath.Abs(inputDir); err == nil {
+		inputDir = idir
+	}
+}
 
 func inputPath(day int, suffix ...string) string {
+	inputDir := inputDir
+	dirName := fmt.Sprintf("day%02d", day)
+	if filepath.Base(inputDir) != dirName {
+		inputDir = filepath.Join(inputDir, dirName)
+	}
+
 	var s string
 	if len(suffix) > 0 {
 		s = strings.Join(suffix, "")

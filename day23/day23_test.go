@@ -16,5 +16,6 @@ func TestDay23(t *testing.T) {
 		"dec a",
 		"dec a",
 	}, false))
-	TestEqual(t, 12748, assembunny(Lines(23), true))
+	TestEqual(t, 12748, assembunny(Lines(23), false))
+	TestEqual(t, 479009308, assembunny(Lines(23), true))
 }
