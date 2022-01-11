@@ -24,5 +24,5 @@ func TestDay22(t *testing.T) {
 	}
 	TestEqual(t, 7, day22b(example))
 	fmt.Println("--")
-	TestEqual(t, 1, day22b(Lines(22)))
+	TestEqual(t, 188, day22b(Lines(22)))
 }
