@@ -1,4 +1,4 @@
-package day23
+package day25
 
 import (
 	"fmt"
@@ -7,18 +7,14 @@ import (
 	. "github.com/rafael-luigi-bekkema/advent-of-code-2016/util"
 )
 
-func assembunny(cmds []string, b bool) int {
+func assembunny(cmds []string, aval int) bool {
 	type CPU struct {
 		regs    [4]int
 		counter int
 	}
 
 	var cpu CPU
-	if b {
-		cpu.regs[0] = 12
-	} else {
-		cpu.regs[0] = 7
-	}
+	cpu.regs[0] = aval
 
 	set := func(s string, v int) {
 		cpu.regs[s[0]-'a'] = v
@@ -39,6 +35,9 @@ func assembunny(cmds []string, b bool) int {
 		}
 		return true
 	}
+
+	var count, prev int
+	var err bool
 
 	run := func(ins string) {
 		cmd, rest, _ := strings.Cut(ins, " ")
@@ -80,6 +79,18 @@ func assembunny(cmds []string, b bool) int {
 			if xval := get(x); xval != 0 {
 				cpu.counter += get(jmp) - 1
 			}
+		case "out":
+			val := get(rest)
+			if count == 0 && val != 0 {
+				err = true
+				break
+			}
+			if count > 0 && (prev == 1 && val != 0 || prev == 0 && val != 1) {
+				err = true
+				break
+			}
+			prev = val
+			count++
 		case "tgl":
 			jmp := get(rest)
 			newi := cpu.counter + jmp
@@ -107,12 +118,28 @@ func assembunny(cmds []string, b bool) int {
 
 	for cpu.counter = 0; cpu.counter < len(cmds); cpu.counter++ {
 		run(cmds[cpu.counter])
+		if err {
+			return false
+		}
+		if count > 20 {
+			return true
+		}
 	}
 
-	return cpu.regs[0] // register 'a'
+	return false // register 'a'
 }
 
-func Day23() {
-	res := assembunny(Lines(23), true)
-	fmt.Println("day 23a:", res)
+func day25a(cmds []string) int {
+	var i int
+	for {
+		if assembunny(cmds, i) {
+			break
+		}
+		i++
+	}
+	return i
+}
+
+func Day25a() {
+	fmt.Println("day 25a:", day25a(Lines(25)))
 }
